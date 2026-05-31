@@ -1,101 +1,92 @@
-# Original Research: Bidirectional Evolutionary Planning for Agent Skills
+# Original Research: Self-Improving Language Models with Bidirectional Evolutionary Search
 
-## Abstract
+This repository packages a practical agent skill inspired by the original BES research:
 
-Bidirectional Evolutionary Planning (BEP), implemented here as BES Deep Mode, is a bounded reasoning pattern for agent skills. It reduces first-pass planning errors by forcing an agent to search from both ends of a problem: forward from possible actions and backward from the desired final state. Candidate plans are recombined, scored, and reviewed before execution.
+- Project page: <https://guoweixu.com/bes/>
+- Paper: <https://arxiv.org/abs/2605.28814>
+- Code: <https://github.com/Embodied-Minds-Lab/BES>
 
-This repository does not claim to reproduce an external paper. It documents an original applied pattern for practical agent work.
+## Citation
 
-## Problem
+```bibtex
+@misc{xu2026selfimprovinglanguagemodelsbidirectional,
+      title={Self-Improving Language Models with Bidirectional Evolutionary Search},
+      author={Guowei Xu and Zhenting Qi and Huangyuan Su and Weirui Ye and Himabindu Lakkaraju and Sham M. Kakade and Yilun Du},
+      year={2026},
+      eprint={2605.28814},
+      archivePrefix={arXiv},
+      primaryClass={cs.CL},
+      url={https://arxiv.org/abs/2605.28814},
+}
+```
 
-Single-pass agent planning tends to fail in four predictable ways:
+## What BES contributes
 
-1. It commits to the first plausible solution.
-2. It misses constraints that are only obvious from the desired end state.
-3. It overbuilds abstractions before proving they pay for themselves.
-4. It treats review as narrative rather than as a gate that can reject the plan.
+Bidirectional Evolutionary Search (BES) couples two processes:
 
-The failure mode is most expensive on architecture, debugging, security-sensitive work, migrations, and high-impact operational changes.
+1. **Forward candidate evolution**: standard expansion plus evolutionary operators that recombine and edit partial trajectories.
+2. **Backward goal decomposition**: recursive decomposition of the original task into checkable sub-goals that provide dense intermediate feedback.
 
-## Hypothesis
+The project page summarizes the motivation: best-of-N sampling and tree search are limited by sparse verification signals and by expansion from high-probability model regions. BES adds evolutionary operators to escape expansion-only search regions and backward decomposition to provide denser feedback.
 
-A small, explicit loop improves reliability if it requires the agent to:
+## Forward search operators
 
-- generate multiple forward candidates;
-- derive backward requirements from the final state;
-- recombine only the strongest plan fragments;
-- score the merged plan against practical criteria;
-- stop when repeated review passes find no material improvement.
+The original BES method describes five forward operators:
 
-## Method
+- **Expansion**: the policy generates new steps.
+- **Combination**: two trajectories sharing a common prefix concatenate their distinct suffixes.
+- **Deletion**: an interior step is removed.
+- **Translocation**: a step in one path is replaced by a step from another path.
+- **Crossover**: one path is cut at a splice point and its tail is replaced by another path's tail.
 
-BEP is intentionally lightweight. It is not a tree search engine and does not require model finetuning.
+## Backward search
 
-### 1. Forward candidates
+Backward search decomposes the problem into a tree of fine-grained sub-goals. Forward nodes are scored against that tree: candidates that address more sub-goals receive higher scores, even before fully solving the task.
 
-Generate 2-4 approaches with different risk profiles:
+## Reported benchmark results
 
-- conservative/simple;
-- robust/production;
-- experimental/high-upside;
-- hybrid when useful.
+The benchmark numbers below are copied from the BES project page on 2026-05-31. Higher is better unless noted.
 
-### 2. Backward requirements
+### Multi-hop reasoning post-training: MuSiQue
 
-Start from the desired final state and list what must be true:
+| Backbone | Method | Accuracy (EM) | Delta vs base | # Valid Search | # Valid Actions | Finish Ratio |
+| --- | --- | ---: | ---: | ---: | ---: | ---: |
+| Llama-3.2-3B | Base | 4.0 | — | — | — | — |
+| Llama-3.2-3B | GRPO | 2.1 | -1.9 | 0.84 | 0.20 | 0.64 |
+| Llama-3.2-3B | Tree-GRPO | 3.9 | -0.1 | 1.50 | 2.14 | 0.64 |
+| Llama-3.2-3B | BES | 7.0 | +3.0 | 2.31 | 3.29 | 0.97 |
+| Llama-3.1-8B | Base | 6.6 | — | — | — | — |
+| Llama-3.1-8B | GRPO | 5.6 | -1.0 | 1.46 | 1.83 | 0.37 |
+| Llama-3.1-8B | Tree-GRPO | 7.4 | +0.8 | 0.65 | 1.36 | 0.71 |
+| Llama-3.1-8B | BES | 10.4 | +3.8 | 2.11 | 3.05 | 0.94 |
 
-- required behavior;
-- failure modes;
-- minimum useful implementation;
-- verification evidence.
+### Open problem solving with GPT-5 backbone
 
-### 3. Evolutionary recombination
+Reported format: mean ± std over 3 seeds / best.
 
-Merge candidate fragments using selection pressure:
+| Method | Circle Packing (Square, n=26) | Circle Packing (Rectangle, n=21) | Heilbronn (Convex, n=13) |
+| --- | ---: | ---: | ---: |
+| Human | — / 2.634 | — / 2.364 | — / 0.0306 |
+| AlphaEvolve | — / 2.635 | — / 2.3658 | — / 0.0309 |
+| OpenEvolve | 2.531 ± .018 / 2.541 | 2.267 ± .014 / 2.276 | 0.025 ± .005 / 0.027 |
+| GEPA | 2.613 ± .022 / 2.628 | 2.326 ± .023 / 2.354 | 0.025 ± .002 / 0.027 |
+| ShinkaEvolve | 2.464 ± .083 / 2.541 | 2.335 ± .026 / 2.358 | 0.023 ± .005 / 0.026 |
+| BES | 2.623 ± .014 / 2.632 | 2.349 ± .012 / 2.360 | 0.026 ± .001 / 0.027 |
 
-- keep cheap robust pieces;
-- discard complexity without clear payoff;
-- add guardrails found by backward reasoning;
-- preserve reversibility where possible.
+## Relationship to this skill
 
-### 4. Evaluation gate
+`skill/SKILL.md` is not a full reproduction of the BES algorithm. It adapts the paper's core discipline into a lightweight agent skill:
 
-Score the merged plan from 1 to 5 on:
+- generate multiple forward candidate plans;
+- reason backward from desired final state and verification evidence;
+- recombine the strongest plan fragments;
+- score the result before acting;
+- run bounded self-review after execution.
 
-- usefulness;
-- reliability;
-- cost/latency;
-- maintainability;
-- reversibility.
-
-Any score below 4 forces one revision before acting.
-
-### 5. Bounded self-review
-
-After execution, run at most 3 review/patch cycles. Stop early after 2 consecutive reviews find no material issue.
-
-## Safety properties
-
-BEP is useful only if it stays bounded.
-
-- It must not run for every message.
-- It must not replace domain-specific tools or tests.
-- It must not justify hidden mutation of credentials, config, or user-owned files.
-- It must not present internal reasoning as proof.
-- It must require concrete verification before claiming success.
-
-## Practical result
-
-The skill in `skill/SKILL.md` turns BEP into an agent-facing contract. The optional local `bes_runner` described in `references/runner-service.md` can make the loop deterministic by returning structured fields for candidates, requirements, recombination, scoring, and convergence.
-
-## Terminology
-
-- **BEP**: Bidirectional Evolutionary Planning, the general planning pattern.
-- **BES**: Backward/Forward Evolutionary Search, the skill's concise operational name.
-- **BES Deep Mode**: The packaged agent skill in this repository.
+The optional local `bes_runner` notes in this repository describe how an agent host can expose that loop as deterministic structure, while leaving actual reasoning and verification to the agent and its tools.
 
 ## Limitations
 
-- BEP improves planning discipline; it does not guarantee correctness.
-- External verification still comes from tests, inspections, smoke checks, and domain review.
-- The loop has overhead and should be reserved for complex or high-impact work.
+- This repository does not include the original BES training or inference code; use the upstream code repository for that.
+- The skill is a practical adaptation for agent workflows, not a benchmark reproduction.
+- Benchmark results are cited from the project page and should be verified against the paper/code before being used in formal claims.

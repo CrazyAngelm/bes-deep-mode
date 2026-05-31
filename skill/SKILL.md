@@ -138,10 +138,10 @@ Recommended call pattern:
 Use the tool output as a scaffold, not as a substitute for real verification. Still run tests, file readbacks, smoke checks, or external review.
 
 ## Notes
-This is original applied research, not a full implementation of any external paper. It improves agent behavior by combining this skill with a deterministic local `bes_runner` scaffold. For production use, the next step is an LLM-backed runner/service behind a model-routing layer.
+This is a practical agent-skill adaptation of Bidirectional Evolutionary Search (Xu et al., 2026), not a full reproduction of the paper's training or inference system. It improves agent behavior by combining the BES planning discipline with a deterministic local `bes_runner` scaffold. For production use, the next step is an LLM-backed runner/service behind a model-routing layer.
 
 ## References
-- `references/original-research.md` — original research note defining the BES/BEP reasoning pattern used by this skill.
+- `references/original-research.md` — upstream BES links, citation, method summary, and reported benchmark results.
 - `references/install-guide.md` — portable install/verification notes for copying this skill to another agent instance, profile, Docker tenant, or commercial image.
 - `references/runner-service.md` — local runner/service notes and production LLM-backed next step.
 - `references/local-runner-implementation.md` — concrete local tool implementation and verification recipe for the local BES runner.

@@ -1,13 +1,13 @@
 # BES Deep Mode
 
-BES Deep Mode is an agent skill for applying **Bidirectional Evolutionary Planning (BEP)** to hard planning, architecture, debugging, research synthesis, and self-improvement tasks.
+BES Deep Mode is an agent skill inspired by **Bidirectional Evolutionary Search (BES)** from Xu et al., 2026, adapted into a lightweight workflow for hard planning, architecture, debugging, research synthesis, and self-improvement tasks.
 
 The skill is intentionally bounded: it generates multiple candidate approaches, works backward from the desired final state, recombines the strongest pieces, scores the result, and verifies before claiming success.
 
 ## Repository contents
 
 - `skill/SKILL.md` — the installable skill.
-- `references/original-research.md` — original BEP/BES research note.
+- `references/original-research.md` — original BES paper links, citation, method summary, and benchmark results.
 - `references/install-guide.md` — portable installation and verification guide.
 - `references/runner-service.md` — optional runner/service design notes.
 - `references/local-runner-implementation.md` — local runner implementation notes.
@@ -36,11 +36,15 @@ This repository contains no credentials, API keys, private paths, or personal da
 
 The skill explicitly requires confirmation before mutating credentials, config, cross-profile files, or other sensitive state unless that exact mutation was requested.
 
-## Research status
+## Research basis
 
-This is original applied research for agent workflows. It is not a claimed reproduction of any external paper.
+This skill is based on the original BES research page and paper:
 
-See `references/original-research.md` for the BEP method and limitations.
+- Project page: <https://guoweixu.com/bes/>
+- Paper: <https://arxiv.org/abs/2605.28814>
+- Code: <https://github.com/Embodied-Minds-Lab/BES>
+
+See `references/original-research.md` for the citation, method summary, and reported benchmark results.
 
 ## License
 
