@@ -11,6 +11,9 @@ The skill is intentionally bounded: it generates multiple candidate approaches, 
 - `references/install-guide.md` — portable installation and verification guide.
 - `references/runner-service.md` — optional runner/service design notes.
 - `references/local-runner-implementation.md` — local runner implementation notes.
+- `templates/codex-prompt.md` — paste-ready prompt for Codex-style agents.
+- `templates/claude-code-prompt.md` — paste-ready prompt for Claude Code.
+- `scripts/validate_skill.py` — opt-in public-release safety validator.
 
 ## Use cases
 
@@ -29,6 +32,21 @@ Do not use it for quick factual answers, simple formatting edits, arithmetic, or
 Copy `skill/SKILL.md` into your agent skill directory under `bes-deep-mode/SKILL.md`.
 
 See `references/install-guide.md` for example paths and smoke checks.
+
+## Codex / Claude Code
+
+Use the templates when the target agent does not have a native skill loader:
+
+- `templates/codex-prompt.md`
+- `templates/claude-code-prompt.md`
+
+Before publishing changes, run:
+
+```bash
+python scripts/validate_skill.py
+```
+
+The repository intentionally does not install git hooks, shell hooks, background services, or global config. Automation is opt-in and reviewable.
 
 ## Safety and privacy
 
